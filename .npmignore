@@ -1,0 +1,17 @@
+config
+public
+scripts
+src
+dist
+
+.browserslistrc
+.editorconfig
+.eslintignore
+.eslintrc.js
+.prettierignore
+.prettierrc.js
+.stylelintignore
+.stylelintrc.js
+babel.config.js
+postcss.config.js
+rollup.config.js
