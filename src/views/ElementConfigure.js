@@ -2,22 +2,38 @@ import React from 'react';
 import Icon from 'antd/es/icon';
 import InputNumber from 'antd/es/input-number';
 import Button from 'antd/es/button';
+import DndElement from '../components/DndElement';
 
-export default (props) => {
-  const { master } = props;
+const ElementConfigure = React.forwardRef((props, ref) => {
+  const { columns = [], onDrop } = props;
   return (
     <>
-      <div className='atc-config-area'>
-        <div className='atc-group-title'>元素配置</div>
+      <div className='atc-config-area' ref={ref} data-drag-type='column'>
+        <div className='atc-group-title'>列表配置</div>
         <div className='atc-config-tip'>
           <Icon type='info-circle' className='atc-config-tip-icon' />
-          你可以通过拖放元素库中的组件来自定义界面
+          你可以通过拖放元素库中的元素来自定义列表
+        </div>
+        <div className='atc-column-container'>
+          {
+            columns.map((data, index) => (
+              <div className='atc-column' key={data.dataIndex}>
+                <div className='atc-column-index'>
+                  {index + 1}
+                  <Icon type='edit' className='atc-column-edit' />
+                </div>
+                <DndElement onDrop={onDrop} element={data} className='atc-column-title'>
+                  {data.title}
+                </DndElement>
+              </div>
+            ))
+          }
         </div>
       </div>
       <div className='atc-operation-bar'>
         <div className='atc-rows'>
           第
-          <InputNumber className='atc-rows-setting' />
+          <InputNumber className='atc-rows-setting' min={1} />
           行
         </div>
         <div className='atc-rows-btn atc-rows-add'>
@@ -37,4 +53,6 @@ export default (props) => {
       </div>
     </>
   );
-};
+});
+
+export default ElementConfigure;

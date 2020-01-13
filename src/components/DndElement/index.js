@@ -1,15 +1,12 @@
 import React, { useState } from 'react';
-import CanDragingIcon from '../CanDragingIcon';
+import DragingIcon from '../DragingIcon';
 
 export default function DndMaterial(props) {
-  const { children, onDrag, className, disable } = props;
-  const [style, setStyle] = useState();
+  const { children, onDrop, className, disable, element, style } = props;
   const [position, setPosition] = useState({ offsetX: 0, offsetY: 0 });
   const [isDarging, setIsDraging] = useState(false);
   function handleDragStart(e) {
-    setStyle({
-      borderColor: '#188EF2',
-    });
+    e.target.style.borderColor = '#188EF2';
     setPosition({
       offsetX: e.nativeEvent.offsetX,
       offsetY: e.nativeEvent.offsetY,
@@ -19,14 +16,20 @@ export default function DndMaterial(props) {
   function handleDragEnd(e) {
     const left = e.pageX - position.offsetX;
     const top = e.pageY - position.offsetY;
-    setStyle();
+    e.target.style.borderColor = '';
     setIsDraging(false);
-    if (onDrag) {
-      onDrag({
+    if (onDrop) {
+      onDrop({
         x: left,
         y: top,
-      });
+      }, element);
     }
+  }
+  function handleMouseEnter() {
+    setIsDraging(true);
+  }
+  function handleMouseLeave() {
+    setIsDraging(false);
   }
   return (
     <div
@@ -34,9 +37,11 @@ export default function DndMaterial(props) {
       className={className}
       onDragStart={handleDragStart}
       onDragEnd={handleDragEnd}
+      onMouseEnter={handleMouseEnter}
+      onMouseLeave={handleMouseLeave}
       style={style}
     >
-      {isDarging && <CanDragingIcon className='atc-draging-icon' />}
+      {isDarging && <DragingIcon className='atc-draging-icon' />}
       {children}
     </div>
   );
