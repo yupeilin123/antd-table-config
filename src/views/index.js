@@ -1,5 +1,9 @@
 import React, { useRef, useState, useEffect } from 'react';
+import InputNumber from 'antd/es/input-number';
+import Button from 'antd/es/button';
+import Icon from 'antd/es/icon';
 import ElementConfigure from './ElementConfigure';
+import ColumnModal from './ColumnModal';
 import { TableColumn } from '../core';
 import DndElement from '../components/DndElement';
 import './style';
@@ -36,6 +40,9 @@ function AntdTableConfig(props) {
   const elementGroupRef = useRef();
   const atcLayoutRef = useRef();
   const [columns, setColumns] = useState([]);
+  const [modalVisible, setModalVisible] = useState(false);
+  const [currentColumn, setCurrentColumn] = useState({});
+  const columnMap = columns.reduce((a, b) => { a[b.dataIndex] = true; return a; }, {});
 
   function setMoveDropEffect(e) {
     e.dataTransfer.dropEffect = 'move';
@@ -61,15 +68,18 @@ function AntdTableConfig(props) {
       const configAreaRect = configureRef.current.getBoundingClientRect();
       if (configAreaRect.left <= x && configAreaRect.top <= y
         && configAreaRect.right >= x + w && configAreaRect.bottom >= y + h) {
-        Columns.add(element);
+        Columns.add({
+          ...element,
+          width: 120,
+        });
         updateColumns();
       }
     }
   }
 
-  function deleteOrEditColumn(layout, element) {
+  function moveColumn(layout, element) {
     if (elementGroupRef.current) {
-      const { x, y, w = 120, h = 40 } = layout;
+      const { x, y } = layout;
       const configAreaRect = elementGroupRef.current.getBoundingClientRect();
       if (configAreaRect.left <= x && configAreaRect.top <= y
         && configAreaRect.right >= x && configAreaRect.bottom >= y) {
@@ -78,6 +88,18 @@ function AntdTableConfig(props) {
       }
     }
   }
+
+  function displayEditModalVisible(column) {
+    setModalVisible(!modalVisible);
+    setCurrentColumn(column);
+  }
+
+  function editColumn(value) {
+    Columns.edit(value);
+    updateColumns();
+    setModalVisible(!modalVisible);
+  }
+
 
   return (
     <section className='atc-layout' ref={atcLayoutRef}>
@@ -90,6 +112,7 @@ function AntdTableConfig(props) {
                 key={element.dataIndex}
                 className='atc-element'
                 element={element}
+                disable={columnMap[element.dataIndex]}
                 onDrop={addColumn}
               >
                 {element.title}
@@ -99,8 +122,40 @@ function AntdTableConfig(props) {
         </div>
       </section>
       <section className='atc-layout-content'>
-        <ElementConfigure onDrop={deleteOrEditColumn} columns={columns} ref={configureRef} />
+        <ElementConfigure
+          ref={configureRef}
+          columns={columns}
+          onOpen={displayEditModalVisible}
+          onDrop={moveColumn}
+        />
+        <div className='atc-operation-bar'>
+          <div className='atc-rows'>
+            第
+            <InputNumber className='atc-rows-setting' min={1} />
+            行
+          </div>
+          <div className='atc-rows-btn atc-rows-add'>
+            <Icon type='plus-circle' className='atc-rows-icon' />
+            添加
+          </div>
+          <div className='atc-operation-divider' />
+          <div className='atc-rows-btn atc-rows-delete'>
+            <Icon type='delete' className='atc-rows-icon' />
+            删除
+          </div>
+          <div className='atc-operation-btns'>
+            <Button>重置</Button>
+            <Button className='atc-operation-btn' type='primary' ghost>预览</Button>
+            <Button className='atc-operation-btn' type='primary'>保存</Button>
+          </div>
+        </div>
       </section>
+      <ColumnModal
+        visible={modalVisible}
+        formValue={currentColumn}
+        onOk={editColumn}
+        onCancel={displayEditModalVisible}
+      />
     </section>
   );
 }

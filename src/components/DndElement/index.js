@@ -5,6 +5,7 @@ export default function DndMaterial(props) {
   const { children, onDrop, className, disable, element, style } = props;
   const [position, setPosition] = useState({ offsetX: 0, offsetY: 0 });
   const [isDarging, setIsDraging] = useState(false);
+
   function handleDragStart(e) {
     e.target.style.borderColor = '#188EF2';
     setPosition({
@@ -26,15 +27,20 @@ export default function DndMaterial(props) {
     }
   }
   function handleMouseEnter() {
-    setIsDraging(true);
+    if (!disable) {
+      setIsDraging(true);
+    }
   }
   function handleMouseLeave() {
-    setIsDraging(false);
+    if (!disable) {
+      setIsDraging(false);
+    }
   }
+
   return (
     <div
       draggable={!disable}
-      className={className}
+      className={`${className} ${disable ? 'atc-used-selected' : ''}`}
       onDragStart={handleDragStart}
       onDragEnd={handleDragEnd}
       onMouseEnter={handleMouseEnter}

@@ -16,13 +16,12 @@ class TableColumn {
 
   }
 
-  // eslint-disable-next-line class-methods-use-this
-  edit() {
-
+  edit(column) {
+    this.data[this.data.findIndex((_) => _.dataIndex === column.dataIndex)] = column;
   }
 
-  delete({ dataIndex } = {}) {
-    this.data.splice(this.data.findIndex((_) => _.dataIndex === dataIndex), 1);
+  delete(column) {
+    this.data.splice(this.data.findIndex((_) => _.dataIndex === column.dataIndex), 1);
   }
 }
 
