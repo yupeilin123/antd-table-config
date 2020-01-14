@@ -4,15 +4,15 @@ class TableColumn {
   }
 
   constructor() {
-    this.data = []; // title , dataIndex ,  width
-  }
-
-  add(column) {
-    this.data.push(column);
+    this.data = []; // title ,dataIndex ,width
   }
 
   insert(column, insertIndex) {
     this.data.splice(insertIndex, 0, column);
+  }
+
+  replace(column, targetIndex) {
+    this.data[targetIndex] = column;
   }
 
   swap(sourceIndex, targetIndex) {
@@ -23,8 +23,8 @@ class TableColumn {
     this.data[this.data.findIndex((_) => _.dataIndex === column.dataIndex)] = column;
   }
 
-  delete(column) {
-    this.data.splice(this.data.findIndex((_) => _.dataIndex === column.dataIndex), 1);
+  delete(targetIndex) {
+    this.data.splice(targetIndex, 1);
   }
 }
 

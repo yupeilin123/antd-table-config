@@ -6,7 +6,7 @@ let dragIndex;
 let enterIndex;
 
 const ElementConfigure = React.forwardRef((props, ref) => {
-  const { columns = [], onOpen, onSwap, onMove, onAdd } = props;
+  const { columns = [], onOpen, onSwap, onMove, onAdd, onReplace } = props;
   const [currentDataIndex, setCurrentDataIndex] = useState();
 
   function dragStart(e) {
@@ -19,7 +19,6 @@ const ElementConfigure = React.forwardRef((props, ref) => {
       }
     });
   }
-
   function dragend(e) {
     e.target.style.opacity = '';
     const currentColumn = columns.find((_) => _.dataIndex === e.target.dataset.index);
@@ -47,11 +46,16 @@ const ElementConfigure = React.forwardRef((props, ref) => {
   }
 
   function drop(e) {
-    const element = JSON.parse(e.dataTransfer.getData('element'));
+    const elementStr = e.dataTransfer.getData('element');
     e.target.style.borderStyle = '';
-    if (element) {
+    if (elementStr) {
+      const element = JSON.parse(elementStr);
       if (enterIndex || enterIndex === 0) {
-        onAdd(element, enterIndex + 1);
+        if (columns[enterIndex].dataIndex) {
+          onAdd(element, enterIndex + 1);
+        } else {
+          onReplace(element, enterIndex);
+        }
       } else {
         onAdd(element, columns.length);
       }
@@ -78,8 +82,8 @@ const ElementConfigure = React.forwardRef((props, ref) => {
     };
   }, []);
 
-  function handleMouseEnter(e) {
-    setCurrentDataIndex(e.target.dataset.index);
+  function handleMouseEnter(dataIndex) {
+    setCurrentDataIndex(dataIndex);
   }
   function handleMouseLeave() {
     setCurrentDataIndex();
@@ -89,7 +93,7 @@ const ElementConfigure = React.forwardRef((props, ref) => {
     <div className='atc-config-area' ref={ref} data-drag-type='column'>
       {
         columns.map((data, index) => (
-          <div className='atc-column' key={data.dataIndex}>
+          <div className='atc-column' key={data.dataIndex || index + 1}>
             <div className='atc-column-index'>
               {index + 1}
               <Icon type='edit' className='atc-column-edit' onClick={onOpen.bind(this, data)} />
@@ -97,11 +101,11 @@ const ElementConfigure = React.forwardRef((props, ref) => {
             <div
               draggable
               className='atc-column-title'
-              onMouseEnter={handleMouseEnter}
+              onMouseEnter={handleMouseEnter.bind(this, data.dataIndex || index + 1)}
               onMouseLeave={handleMouseLeave}
               data-index={data.dataIndex}
             >
-              {currentDataIndex === data.dataIndex && <DragingIcon className='atc-draging-icon' />}
+              {currentDataIndex === (data.dataIndex || index + 1) && <DragingIcon className='atc-draging-icon' />}
               {data.title}
             </div>
           </div>

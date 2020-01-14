@@ -9,6 +9,29 @@ import DndComp from '../components/DndComp';
 import './style';
 import './index.less';
 
+const data = [{
+  title: '姓名',
+  dataIndex: 'patientName',
+}, {
+  title: '年龄',
+  dataIndex: 'age',
+}, {
+  title: '出生日期',
+  dataIndex: 'birthday',
+}, {
+  title: '采样日期',
+  dataIndex: 'deliverDay',
+}, {
+  title: '报告日期',
+  dataIndex: 'reportDay',
+}, {
+  title: '检测方案',
+  dataIndex: 'prodcde',
+}, {
+  title: '样本类型',
+  dataIndex: 'sampleType',
+}];
+
 const Columns = TableColumn.initialize();
 
 function AntdTableConfig(props) {
@@ -19,6 +42,7 @@ function AntdTableConfig(props) {
   const [columns, setColumns] = useState(Columns.data || []);
   const [modalVisible, setModalVisible] = useState(false);
   const [currentColumn, setCurrentColumn] = useState({});
+  const [lines, setLines] = useState(undefined);
   const columnMap = columns.reduce((a, b) => { a[b.dataIndex] = true; return a; }, {});
 
   function setMoveDropEffect(e) {
@@ -45,6 +69,9 @@ function AntdTableConfig(props) {
       width: 120,
     }, insertIndex);
     updateColumns();
+    if (lines) {
+      setLines();
+    }
   }
 
   function editColumn(column) {
@@ -53,18 +80,29 @@ function AntdTableConfig(props) {
     setModalVisible(!modalVisible);
   }
 
-  function swapColumn(source, target) {
-    Columns.swap(source, target);
+  function swapColumn(sourceIndex, targetIndex) {
+    Columns.swap(sourceIndex, targetIndex);
     updateColumns();
   }
 
-  function deleteColumn(layout, element) {
+  function replaceColumn(column, targetIndex) {
+    Columns.replace(column, targetIndex);
+    updateColumns();
+  }
+
+  function deleteColumn(targetIndex) {
+    Columns.delete(targetIndex);
+    updateColumns();
+  }
+
+  function moveColumn(layout, element) {
     if (elementGroupRef.current) {
       const { x, y } = layout;
       const configAreaRect = elementGroupRef.current.getBoundingClientRect();
       if (configAreaRect.left <= x && configAreaRect.top <= y
         && configAreaRect.right >= x && configAreaRect.bottom >= y) {
-        Columns.delete(element);
+        const index = columns.findIndex((_) => _.dataIndex === element.dataIndex);
+        Columns.delete(index);
         updateColumns();
       }
     }
@@ -82,7 +120,7 @@ function AntdTableConfig(props) {
         <div className='atc-group-title'>元素库</div>
         <div className='atc-elements-container'>
           {
-            (dataSource || []).map((element) => (
+            (data || []).map((element) => (
               <DndComp
                 key={element.dataIndex}
                 className='atc-element'
@@ -108,22 +146,23 @@ function AntdTableConfig(props) {
           ref={configureRef}
           columns={columns}
           onOpen={displayEditModalVisible}
-          onMove={deleteColumn}
+          onMove={moveColumn}
           onSwap={swapColumn}
+          onReplace={replaceColumn}
           onAdd={addColumn}
         />
         <div className='atc-operation-bar'>
           <div className='atc-rows'>
             第
-            <InputNumber className='atc-rows-setting' min={1} />
+            <InputNumber className='atc-rows-setting' min={1} max={columns.length + 1} value={lines} onChange={(value) => setLines(value)} />
             行
           </div>
-          <div className='atc-rows-btn atc-rows-add'>
+          <div className='atc-rows-btn atc-rows-add' onClick={addColumn.bind(this, {}, lines - 1)}>
             <Icon type='plus-circle' className='atc-rows-icon' />
             添加
           </div>
           <div className='atc-operation-divider' />
-          <div className='atc-rows-btn atc-rows-delete'>
+          <div className='atc-rows-btn atc-rows-delete' onClick={deleteColumn.bind(this, lines - 1)}>
             <Icon type='delete' className='atc-rows-icon' />
             删除
           </div>
