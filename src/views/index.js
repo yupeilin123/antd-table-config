@@ -5,7 +5,7 @@ import Icon from 'antd/es/icon';
 import ElementConfigure from './ElementConfigure';
 import ColumnModal from './ColumnModal';
 import { TableColumn } from '../core';
-import DndElement from '../components/DndElement';
+import DndComp from '../components/DndComp';
 import './style';
 import './index.less';
 
@@ -39,7 +39,7 @@ function AntdTableConfig(props) {
   const configureRef = useRef();
   const elementGroupRef = useRef();
   const atcLayoutRef = useRef();
-  const [columns, setColumns] = useState([]);
+  const [columns, setColumns] = useState(Columns.data || []);
   const [modalVisible, setModalVisible] = useState(false);
   const [currentColumn, setCurrentColumn] = useState({});
   const columnMap = columns.reduce((a, b) => { a[b.dataIndex] = true; return a; }, {});
@@ -79,10 +79,10 @@ function AntdTableConfig(props) {
 
   function moveColumn(layout, element) {
     if (elementGroupRef.current) {
-      const { x, y } = layout;
+      const { clientX, clientY } = layout;
       const configAreaRect = elementGroupRef.current.getBoundingClientRect();
-      if (configAreaRect.left <= x && configAreaRect.top <= y
-        && configAreaRect.right >= x && configAreaRect.bottom >= y) {
+      if (configAreaRect.left <= clientX && configAreaRect.top <= clientY
+        && configAreaRect.right >= clientX && configAreaRect.bottom >= clientY) {
         Columns.delete(element);
         updateColumns();
       }
@@ -108,20 +108,29 @@ function AntdTableConfig(props) {
         <div className='atc-elements-container'>
           {
             (data || []).map((element) => (
-              <DndElement
+              <DndComp
                 key={element.dataIndex}
                 className='atc-element'
                 element={element}
                 disable={columnMap[element.dataIndex]}
                 onDrop={addColumn}
+                type='element'
               >
                 {element.title}
-              </DndElement>
+              </DndComp>
             ))
           }
         </div>
       </section>
       <section className='atc-layout-content'>
+        <div className='atc-config-header'>
+          <div className='atc-group-title'>列表配置</div>
+          <div className='atc-config-tip'>
+            <Icon type='info-circle' className='atc-config-tip-icon' />
+            你可以通过拖放元素库中的元素来自定义列表
+            <div style={{ paddingLeft: 20 }}>添加的行数多余一行时，按第一行添加</div>
+          </div>
+        </div>
         <ElementConfigure
           ref={configureRef}
           columns={columns}
