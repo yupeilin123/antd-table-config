@@ -39,27 +39,31 @@ function AntdTableConfig(props) {
     setColumns([...Columns.data]);
   }
 
-  function addColumn(layout, element) {
-    if (configureRef.current) {
-      const { x, y, w = 120, h = 40 } = layout;
-      const configAreaRect = configureRef.current.getBoundingClientRect();
-      if (configAreaRect.left <= x && configAreaRect.top <= y
-        && configAreaRect.right >= x + w && configAreaRect.bottom >= y + h) {
-        Columns.add({
-          ...element,
-          width: 120,
-        });
-        updateColumns();
-      }
-    }
+  function addColumn(element, insertIndex) {
+    Columns.insert({
+      ...element,
+      width: 120,
+    }, insertIndex);
+    updateColumns();
   }
 
-  function moveColumn(layout, element) {
+  function editColumn(column) {
+    Columns.edit(column);
+    updateColumns();
+    setModalVisible(!modalVisible);
+  }
+
+  function swapColumn(source, target) {
+    Columns.swap(source, target);
+    updateColumns();
+  }
+
+  function deleteColumn(layout, element) {
     if (elementGroupRef.current) {
-      const { clientX, clientY } = layout;
+      const { x, y } = layout;
       const configAreaRect = elementGroupRef.current.getBoundingClientRect();
-      if (configAreaRect.left <= clientX && configAreaRect.top <= clientY
-        && configAreaRect.right >= clientX && configAreaRect.bottom >= clientY) {
+      if (configAreaRect.left <= x && configAreaRect.top <= y
+        && configAreaRect.right >= x && configAreaRect.bottom >= y) {
         Columns.delete(element);
         updateColumns();
       }
@@ -69,12 +73,6 @@ function AntdTableConfig(props) {
   function displayEditModalVisible(column) {
     setModalVisible(!modalVisible);
     setCurrentColumn(column);
-  }
-
-  function editColumn(value) {
-    Columns.edit(value);
-    updateColumns();
-    setModalVisible(!modalVisible);
   }
 
 
@@ -90,8 +88,6 @@ function AntdTableConfig(props) {
                 className='atc-element'
                 element={element}
                 disable={columnMap[element.dataIndex]}
-                onDrop={addColumn}
-                type='element'
               >
                 {element.title}
               </DndComp>
@@ -112,7 +108,9 @@ function AntdTableConfig(props) {
           ref={configureRef}
           columns={columns}
           onOpen={displayEditModalVisible}
-          onDrop={moveColumn}
+          onMove={deleteColumn}
+          onSwap={swapColumn}
+          onAdd={addColumn}
         />
         <div className='atc-operation-bar'>
           <div className='atc-rows'>

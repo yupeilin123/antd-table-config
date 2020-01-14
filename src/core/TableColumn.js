@@ -4,22 +4,19 @@ class TableColumn {
   }
 
   constructor() {
-    this.data = [{
-      title: '姓名',
-      dataIndex: 'patientName',
-    }, {
-      title: '年龄',
-      dataIndex: 'age',
-    }]; // title , dataIndex ,  width
+    this.data = []; // title , dataIndex ,  width
   }
 
   add(column) {
     this.data.push(column);
   }
 
-  // eslint-disable-next-line class-methods-use-this
-  insert() {
+  insert(column, insertIndex) {
+    this.data.splice(insertIndex, 0, column);
+  }
 
+  swap(sourceIndex, targetIndex) {
+    [this.data[sourceIndex], this.data[targetIndex]] = [this.data[targetIndex], this.data[sourceIndex]];
   }
 
   edit(column) {
