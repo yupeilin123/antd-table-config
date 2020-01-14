@@ -4,7 +4,13 @@ class TableColumn {
   }
 
   constructor() {
-    this.data = []; // title , dataIndex ,  width
+    this.data = [{
+      title: '姓名',
+      dataIndex: 'patientName',
+    }, {
+      title: '年龄',
+      dataIndex: 'age',
+    }]; // title , dataIndex ,  width
   }
 
   add(column) {
