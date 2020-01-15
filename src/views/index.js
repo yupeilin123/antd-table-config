@@ -11,36 +11,13 @@ import DndComp from '../components/DndComp';
 import './style';
 import './index.less';
 
-const data = [{
-  title: '姓名',
-  dataIndex: 'patientName',
-}, {
-  title: '年龄',
-  dataIndex: 'age',
-}, {
-  title: '出生日期',
-  dataIndex: 'birthday',
-}, {
-  title: '采样日期',
-  dataIndex: 'deliverDay',
-}, {
-  title: '报告日期',
-  dataIndex: 'reportDay',
-}, {
-  title: '检测方案',
-  dataIndex: 'prodcde',
-}, {
-  title: '样本类型',
-  dataIndex: 'sampleType',
-}];
-
 const Columns = TableColumn.initialize();
 
 let dragIndex;
 let enterIndex;
 
 function AntdTableConfig(props) {
-  const { dataSource = [], onSave } = props;
+  const { dataSource = [], height, closable, onSave, onClose } = props;
   const configureRef = useRef();
   const elementGroupRef = useRef();
   const atcLayoutRef = useRef();
@@ -193,6 +170,8 @@ function AntdTableConfig(props) {
     Modal.confirm({
       title: '清空列表配置',
       content: '将为您情况所有的列配置项，是否确认情况？',
+      cancelText: '取消',
+      okText: '确认',
       onOk: () => {
         Columns.clear();
         updateColumns();
@@ -207,12 +186,12 @@ function AntdTableConfig(props) {
   }
 
   return (
-    <section className='atc-layout' ref={atcLayoutRef}>
+    <section className='atc-layout' ref={atcLayoutRef} style={{ height }}>
       <section className='atc-slider' ref={elementGroupRef} data-drag-type='element'>
         <div className='atc-group-title'>元素库</div>
         <div className='atc-elements-container'>
           {
-            (data || []).map((element) => (
+            (dataSource || []).map((element) => (
               <DndComp
                 key={element.dataIndex}
                 className='atc-element'
@@ -257,7 +236,8 @@ function AntdTableConfig(props) {
           <div className='atc-operation-btns'>
             <Button onClick={restColumnConfig}>重置</Button>
             <Button className='atc-operation-btn' type='primary' ghost onClick={displayModalVisible.bind(this, {}, 'preview')}>预览</Button>
-            <Button className='atc-operation-btn' type='primary' onSave={saveColumns}>保存</Button>
+            <Button className='atc-operation-btn' type='primary' onClick={saveColumns}>保存</Button>
+            {closable && <Button className='atc-operation-btn' onClick={onClose}>关闭</Button>}
           </div>
         </div>
       </section>
