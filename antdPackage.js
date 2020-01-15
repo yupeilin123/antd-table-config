@@ -1,3 +1,15 @@
 export default [
-
+  'antd/es/input-number',
+  'antd/es/input',
+  'antd/es/table',
+  'antd/es/form',
+  'antd/es/modal',
+  'antd/es/button',
+  'antd/es/input-number/style',
+  'antd/es/input/style',
+  'antd/es/table/style',
+  'antd/es/form/style',
+  'antd/es/modal/style',
+  'antd/es/button/style',
+  'antd/es/icon',
 ];

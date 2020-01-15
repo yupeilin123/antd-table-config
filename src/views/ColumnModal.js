@@ -24,6 +24,7 @@ const ColumnModal = (props) => {
       visible={visible}
       onOk={sumbit}
       onCancel={onCancel}
+      maskClosable={false}
       afterClose={() => resetFields()}
     >
       <Form>

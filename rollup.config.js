@@ -1,7 +1,6 @@
 import babel from 'rollup-plugin-babel';
 import resolve from 'rollup-plugin-node-resolve';
 import commonjs from 'rollup-plugin-commonjs';
-import copy from 'rollup-plugin-copy';
 import postcss from 'rollup-plugin-postcss';
 import antdPackage from './antdPackage';
 import { version } from './package.json';
@@ -29,12 +28,6 @@ export default {
     }),
     babel({
       exclude: 'node_modules/**',
-    }),
-    copy({
-      targets: [
-        { src: 'src/assets/background.svg', dest: 'assets' },
-        { src: 'src/index.d.ts', dest: 'lib' },
-      ],
     }),
   ],
   onwarn(warning, warn) {

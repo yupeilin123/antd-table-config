@@ -21,7 +21,7 @@ const ElementConfigure = React.forwardRef((props, ref) => {
           <div className='atc-column' key={data.dataIndex || index + 1}>
             <div className='atc-column-index'>
               {index + 1}
-              <Icon type='edit' className='atc-column-edit' onClick={onOpen.bind(this, data)} />
+              <Icon type='edit' className='atc-column-edit' onClick={onOpen.bind(this, data, 'edit')} />
             </div>
             <div
               draggable

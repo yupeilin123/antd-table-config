@@ -1,6 +1,7 @@
 import React, { useRef, useState, useEffect } from 'react';
 import InputNumber from 'antd/es/input-number';
 import Button from 'antd/es/button';
+import Table from 'antd/es/table';
 import Modal from 'antd/es/modal';
 import Icon from 'antd/es/icon';
 import ElementConfigure from './ElementConfigure';
@@ -39,18 +40,20 @@ let dragIndex;
 let enterIndex;
 
 function AntdTableConfig(props) {
-  const { dataSource = [] } = props;
+  const { dataSource = [], onSave } = props;
   const configureRef = useRef();
   const elementGroupRef = useRef();
   const atcLayoutRef = useRef();
   const [columns, setColumns] = useState(Columns.data || []);
   const [modalVisible, setModalVisible] = useState(false);
+  const [modalType, setModalType] = useState();
   const [currentColumn, setCurrentColumn] = useState({});
   const [lines, setLines] = useState(undefined);
   const columnMap = columns.reduce((a, b) => { a[b.dataIndex] = true; return a; }, {});
 
   useEffect(() => {
     atcLayoutRef.current.addEventListener('dragover', setMoveDropEffect);
+    elementGroupRef.current.addEventListener('dragenter', setEnterIndex);
     configureRef.current.addEventListener('dragstart', dragStart);
     configureRef.current.addEventListener('dragend', dragend);
     configureRef.current.addEventListener('dragenter', dragenter);
@@ -58,6 +61,7 @@ function AntdTableConfig(props) {
     configureRef.current.addEventListener('drop', drop);
     return () => {
       atcLayoutRef.current.removeEventListener('dragover', setMoveDropEffect);
+      elementGroupRef.current.removeEventListener('dragenter', setEnterIndex);
       configureRef.current.removeEventListener('dragstart', dragStart);
       configureRef.current.removeEventListener('dragend', dragend);
       configureRef.current.removeEventListener('dragenter', dragenter);
@@ -69,6 +73,10 @@ function AntdTableConfig(props) {
   function setMoveDropEffect(e) {
     e.dataTransfer.dropEffect = 'move';
     e.preventDefault();
+  }
+
+  function setEnterIndex() {
+    enterIndex = undefined;
   }
 
   function dragStart(e) {
@@ -175,9 +183,10 @@ function AntdTableConfig(props) {
     }
   }
 
-  function displayEditModalVisible(column) {
+  function displayModalVisible(column, type) {
     setModalVisible(!modalVisible);
     setCurrentColumn(column);
+    setModalType(type);
   }
 
   function restColumnConfig() {
@@ -189,6 +198,12 @@ function AntdTableConfig(props) {
         updateColumns();
       },
     });
+  }
+
+  function saveColumns() {
+    if (onSave) {
+      onSave(columns);
+    }
   }
 
   return (
@@ -222,7 +237,7 @@ function AntdTableConfig(props) {
         <ElementConfigure
           ref={configureRef}
           columns={columns}
-          onOpen={displayEditModalVisible}
+          onOpen={displayModalVisible}
         />
         <div className='atc-operation-bar'>
           <div className='atc-rows'>
@@ -241,17 +256,33 @@ function AntdTableConfig(props) {
           </div>
           <div className='atc-operation-btns'>
             <Button onClick={restColumnConfig}>重置</Button>
-            <Button className='atc-operation-btn' type='primary' ghost>预览</Button>
-            <Button className='atc-operation-btn' type='primary'>保存</Button>
+            <Button className='atc-operation-btn' type='primary' ghost onClick={displayModalVisible.bind(this, {}, 'preview')}>预览</Button>
+            <Button className='atc-operation-btn' type='primary' onSave={saveColumns}>保存</Button>
           </div>
         </div>
       </section>
       <ColumnModal
-        visible={modalVisible}
+        visible={modalType === 'edit' && modalVisible}
         formValue={currentColumn}
         onOk={editColumn}
-        onCancel={displayEditModalVisible}
+        onCancel={displayModalVisible}
       />
+      <Modal
+        title='预览'
+        className='atc-preview-modal'
+        bodyStyle={{ padding: 0 }}
+        width={780}
+        footer={null}
+        visible={modalType === 'preview' && modalVisible}
+        onCancel={displayModalVisible}
+      >
+        <Table
+          columns={columns}
+          dataSource={[]}
+          scroll={{ x: columns.reduce((a, b) => (a + b.width), 0) }}
+          size='small'
+        />
+      </Modal>
     </section>
   );
 }
