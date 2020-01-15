@@ -26,6 +26,10 @@ class TableColumn {
   delete(targetIndex) {
     this.data.splice(targetIndex, 1);
   }
+
+  clear() {
+    this.data = [];
+  }
 }
 
 export default TableColumn;

@@ -1,6 +1,7 @@
 import React, { useRef, useState, useEffect } from 'react';
 import InputNumber from 'antd/es/input-number';
 import Button from 'antd/es/button';
+import Modal from 'antd/es/modal';
 import Icon from 'antd/es/icon';
 import ElementConfigure from './ElementConfigure';
 import ColumnModal from './ColumnModal';
@@ -34,6 +35,9 @@ const data = [{
 
 const Columns = TableColumn.initialize();
 
+let dragIndex;
+let enterIndex;
+
 function AntdTableConfig(props) {
   const { dataSource = [] } = props;
   const configureRef = useRef();
@@ -45,19 +49,86 @@ function AntdTableConfig(props) {
   const [lines, setLines] = useState(undefined);
   const columnMap = columns.reduce((a, b) => { a[b.dataIndex] = true; return a; }, {});
 
+  useEffect(() => {
+    atcLayoutRef.current.addEventListener('dragover', setMoveDropEffect);
+    configureRef.current.addEventListener('dragstart', dragStart);
+    configureRef.current.addEventListener('dragend', dragend);
+    configureRef.current.addEventListener('dragenter', dragenter);
+    configureRef.current.addEventListener('dragleave', dragleave);
+    configureRef.current.addEventListener('drop', drop);
+    return () => {
+      atcLayoutRef.current.removeEventListener('dragover', setMoveDropEffect);
+      configureRef.current.removeEventListener('dragstart', dragStart);
+      configureRef.current.removeEventListener('dragend', dragend);
+      configureRef.current.removeEventListener('dragenter', dragenter);
+      configureRef.current.removeEventListener('dragleave', dragleave);
+      configureRef.current.removeEventListener('drop', drop);
+    };
+  }, []);
+
   function setMoveDropEffect(e) {
     e.dataTransfer.dropEffect = 'move';
     e.preventDefault();
   }
 
-  useEffect(() => {
-    if (atcLayoutRef.current) {
-      atcLayoutRef.current.addEventListener('dragover', setMoveDropEffect);
+  function dragStart(e) {
+    e.target.style.opacity = 0.5;
+    const dragObj = e.target;
+    const columnList = Array.from(configureRef.current.children).map((ele) => ele.lastElementChild);
+    columnList.forEach((columnObj, index) => {
+      if (columnObj === dragObj) {
+        dragIndex = index;
+      }
+    });
+  }
+  function dragend(e) {
+    e.target.style.opacity = '';
+    const findColumn = columns.find((_) => _.dataIndex === e.target.dataset.index);
+    moveColumn({
+      x: e.clientX,
+      y: e.clientY,
+    }, findColumn);
+  }
+  function dragenter(e) {
+    if (e.target.className === 'atc-column-title') {
+      e.target.style.borderStyle = 'dotted';
+      const enterObj = e.target;
+      const columnList = Array.from(configureRef.current.children).map((ele) => ele.lastElementChild);
+      columnList.forEach((columnObj, index) => {
+        if (columnObj === enterObj) {
+          enterIndex = index;
+        }
+      });
     }
-    return () => {
-      atcLayoutRef.current.removeEventListener('dragover', setMoveDropEffect);
-    };
-  }, []);
+  }
+  function dragleave(e) {
+    if (e.target.style.borderStyle === 'dotted') {
+      e.target.style.borderStyle = 'solid';
+    }
+  }
+
+  function drop(e) {
+    const elementStr = e.dataTransfer.getData('element');
+    e.target.style.borderStyle = '';
+    if (elementStr) {
+      const element = JSON.parse(elementStr);
+      if (enterIndex || enterIndex === 0) {
+        if (columns[enterIndex].dataIndex) {
+          addColumn(element, enterIndex + 1);
+        } else {
+          replaceColumn(element, enterIndex);
+        }
+      } else {
+        addColumn(element, columns.length);
+      }
+    } else {
+      e.preventDefault();
+      if (dragIndex !== enterIndex) {
+        swapColumn(dragIndex, enterIndex);
+      }
+    }
+    enterIndex = undefined;
+  }
 
   function updateColumns() {
     setColumns([...Columns.data]);
@@ -96,15 +167,11 @@ function AntdTableConfig(props) {
   }
 
   function moveColumn(layout, element) {
-    if (elementGroupRef.current) {
-      const { x, y } = layout;
-      const configAreaRect = elementGroupRef.current.getBoundingClientRect();
-      if (configAreaRect.left <= x && configAreaRect.top <= y
-        && configAreaRect.right >= x && configAreaRect.bottom >= y) {
-        const index = columns.findIndex((_) => _.dataIndex === element.dataIndex);
-        Columns.delete(index);
-        updateColumns();
-      }
+    const { x, y } = layout;
+    const { left, right, top, bottom } = configureRef.current.getBoundingClientRect();
+    if (left > x || right < x || top > y || bottom < y) {
+      const index = columns.findIndex((_) => _.dataIndex === element.dataIndex);
+      deleteColumn(index);
     }
   }
 
@@ -113,6 +180,16 @@ function AntdTableConfig(props) {
     setCurrentColumn(column);
   }
 
+  function restColumnConfig() {
+    Modal.confirm({
+      title: '清空列表配置',
+      content: '将为您情况所有的列配置项，是否确认情况？',
+      onOk: () => {
+        Columns.clear();
+        updateColumns();
+      },
+    });
+  }
 
   return (
     <section className='atc-layout' ref={atcLayoutRef}>
@@ -146,10 +223,6 @@ function AntdTableConfig(props) {
           ref={configureRef}
           columns={columns}
           onOpen={displayEditModalVisible}
-          onMove={moveColumn}
-          onSwap={swapColumn}
-          onReplace={replaceColumn}
-          onAdd={addColumn}
         />
         <div className='atc-operation-bar'>
           <div className='atc-rows'>
@@ -167,7 +240,7 @@ function AntdTableConfig(props) {
             删除
           </div>
           <div className='atc-operation-btns'>
-            <Button>重置</Button>
+            <Button onClick={restColumnConfig}>重置</Button>
             <Button className='atc-operation-btn' type='primary' ghost>预览</Button>
             <Button className='atc-operation-btn' type='primary'>保存</Button>
           </div>

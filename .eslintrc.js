@@ -11,6 +11,7 @@ module.exports = {
     'max-len': [1, { code: 150 }],
     'jsx-quotes': [1, 'prefer-single'],
     'no-unused-vars': [0],
+    'no-use-before-define': [0],
     'no-param-reassign': [0],
     'object-curly-newline': [0],
     'import/no-unresolved': [0],
