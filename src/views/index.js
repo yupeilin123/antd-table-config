@@ -97,7 +97,7 @@ function AntdTableConfig(props) {
     e.target.style.borderStyle = '';
     if (elementStr) {
       const element = JSON.parse(elementStr);
-      if (enterIndex || enterIndex === 0) {
+      if (typeof enterIndex === 'number') {
         if (columns[enterIndex].dataIndex) {
           addColumn(element, enterIndex + 1);
         } else {
@@ -108,7 +108,7 @@ function AntdTableConfig(props) {
       }
     } else {
       e.preventDefault();
-      if (dragIndex !== enterIndex) {
+      if (dragIndex !== enterIndex && typeof enterIndex === 'number') {
         swapColumn(dragIndex, enterIndex);
       }
     }
