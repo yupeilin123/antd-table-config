@@ -12,7 +12,7 @@ class TableColumn {
   }
 
   get() {
-    return this.data;
+    return [...this.data];
   }
 
   insert(column, insertIndex) {

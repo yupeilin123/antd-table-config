@@ -21,7 +21,7 @@ function AntdTableConfig(props) {
   const configureRef = useRef();
   const elementGroupRef = useRef();
   const atcLayoutRef = useRef();
-  const [columns, setColumns] = useState(Columns.data || []);
+  const [columns, setColumns] = useState([]);
   const [modalVisible, setModalVisible] = useState(false);
   const [modalType, setModalType] = useState();
   const [currentColumn, setCurrentColumn] = useState({});
@@ -75,7 +75,7 @@ function AntdTableConfig(props) {
   }
   function dragend(e) {
     e.target.style.opacity = '';
-    const findColumn = columns.find((_) => _.dataIndex === e.target.dataset.index);
+    const findColumn = Columns.get().find((_) => _.dataIndex === e.target.dataset.index);
     moveColumn({
       x: e.clientX,
       y: e.clientY,
@@ -105,13 +105,13 @@ function AntdTableConfig(props) {
     if (elementStr) {
       const element = JSON.parse(elementStr);
       if (typeof enterIndex === 'number') {
-        if (columns[enterIndex].dataIndex) {
+        if (Columns.get()[enterIndex].dataIndex) {
           addColumn(element, enterIndex + 1);
         } else {
           replaceColumn(element, enterIndex);
         }
       } else {
-        addColumn(element, columns.length);
+        addColumn(element, Columns.get().length);
       }
     } else {
       e.preventDefault();
@@ -123,7 +123,7 @@ function AntdTableConfig(props) {
   }
 
   function updateColumns() {
-    setColumns([...Columns.get()]);
+    setColumns(Columns.get());
   }
 
   function addColumn(element, insertIndex) {
@@ -159,7 +159,7 @@ function AntdTableConfig(props) {
     const { x, y } = layout;
     const { left, right, top, bottom } = configureRef.current.getBoundingClientRect();
     if (left > x || right < x || top > y || bottom < y) {
-      const index = columns.findIndex((_) => _.dataIndex === element.dataIndex);
+      const index = Columns.get().findIndex((_) => _.dataIndex === element.dataIndex);
       deleteColumn(index);
     }
   }
@@ -269,7 +269,7 @@ function AntdTableConfig(props) {
         visible={modalType === 'edit' && modalVisible}
         formValue={currentColumn}
         onOk={editColumn}
-        onCancel={displayModalVisible}
+        onCancel={displayModalVisible.bind(this, {}, 'edit')}
       />
       <Modal
         title='预览'
@@ -278,7 +278,7 @@ function AntdTableConfig(props) {
         width={780}
         footer={null}
         visible={modalType === 'preview' && modalVisible}
-        onCancel={displayModalVisible}
+        onCancel={displayModalVisible.bind(this, {}, 'preview')}
       >
         <Table
           columns={columns}
