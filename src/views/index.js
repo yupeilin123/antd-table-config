@@ -11,13 +11,13 @@ import DndComp from '../components/DndComp';
 import './style';
 import './index.less';
 
-const Columns = TableColumn.initialize();
-
 let dragIndex;
 let enterIndex;
+const Columns = TableColumn.initialize();
+
 
 function AntdTableConfig(props) {
-  const { dataSource = [], height, closable, onSave, onClose } = props;
+  const { dataSource = [], value = [], height, closable, onSave, onClose } = props;
   const configureRef = useRef();
   const elementGroupRef = useRef();
   const atcLayoutRef = useRef();
@@ -25,8 +25,15 @@ function AntdTableConfig(props) {
   const [modalVisible, setModalVisible] = useState(false);
   const [modalType, setModalType] = useState();
   const [currentColumn, setCurrentColumn] = useState({});
-  const [lines, setLines] = useState(undefined);
+  const [lineNumber, setLineNumber] = useState(undefined);
   const columnMap = columns.reduce((a, b) => { a[b.dataIndex] = true; return a; }, {});
+
+  useEffect(() => {
+    if (Array.isArray(value) && value.length) {
+      Columns.set(value);
+      updateColumns();
+    }
+  }, [value]);
 
   useEffect(() => {
     atcLayoutRef.current.addEventListener('dragover', setMoveDropEffect);
@@ -116,7 +123,7 @@ function AntdTableConfig(props) {
   }
 
   function updateColumns() {
-    setColumns([...Columns.data]);
+    setColumns([...Columns.get()]);
   }
 
   function addColumn(element, insertIndex) {
@@ -125,9 +132,6 @@ function AntdTableConfig(props) {
       width: 120,
     }, insertIndex);
     updateColumns();
-    if (lines) {
-      setLines();
-    }
   }
 
   function editColumn(column) {
@@ -157,6 +161,20 @@ function AntdTableConfig(props) {
     if (left > x || right < x || top > y || bottom < y) {
       const index = columns.findIndex((_) => _.dataIndex === element.dataIndex);
       deleteColumn(index);
+    }
+  }
+
+  function handleAddColumn() {
+    if (typeof lineNumber === 'number') {
+      addColumn({}, lineNumber - 1);
+      setLineNumber();
+    }
+  }
+
+  function handleDeleteColumn() {
+    if (typeof lineNumber === 'number') {
+      deleteColumn(lineNumber - 1);
+      setLineNumber();
     }
   }
 
@@ -221,15 +239,21 @@ function AntdTableConfig(props) {
         <div className='atc-operation-bar'>
           <div className='atc-rows'>
             第
-            <InputNumber className='atc-rows-setting' min={1} max={columns.length + 1} value={lines} onChange={(value) => setLines(value)} />
+            <InputNumber
+              className='atc-rows-setting'
+              min={1}
+              max={columns.length + 1}
+              value={lineNumber}
+              onChange={(v) => setLineNumber(v)}
+            />
             行
           </div>
-          <div className='atc-rows-btn atc-rows-add' onClick={addColumn.bind(this, {}, lines - 1)}>
+          <div className='atc-rows-btn atc-rows-add' onClick={handleAddColumn}>
             <Icon type='plus-circle' className='atc-rows-icon' />
             添加
           </div>
           <div className='atc-operation-divider' />
-          <div className='atc-rows-btn atc-rows-delete' onClick={deleteColumn.bind(this, lines - 1)}>
+          <div className='atc-rows-btn atc-rows-delete' onClick={handleDeleteColumn}>
             <Icon type='delete' className='atc-rows-icon' />
             删除
           </div>

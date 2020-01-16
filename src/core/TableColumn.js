@@ -1,10 +1,18 @@
 class TableColumn {
-  static initialize() {
-    return new TableColumn();
+  static initialize(columns) {
+    return new TableColumn(columns);
   }
 
-  constructor() {
-    this.data = []; // title ,dataIndex ,width
+  constructor(columns) {
+    this.data = columns || []; // title ,dataIndex ,width
+  }
+
+  set(columns) {
+    this.data = [...columns];
+  }
+
+  get() {
+    return this.data;
   }
 
   insert(column, insertIndex) {
