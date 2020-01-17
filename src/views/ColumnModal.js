@@ -43,7 +43,7 @@ const ColumnModal = (props) => {
               initialValue: formValue.title,
               rules: [{ required: true, message: '请输入名称' }],
             })(
-              <Input />,
+              <Input placeholder='请输入' />,
             )
           }
         </Form.Item>
@@ -52,7 +52,7 @@ const ColumnModal = (props) => {
             getFieldDecorator('width', {
               initialValue: formValue.width,
             })(
-              <InputNumber min={0} style={{ width: '100%' }} />,
+              <InputNumber placeholder='请输入' min={0} style={{ width: '100%' }} />,
             )
           }
         </Form.Item>

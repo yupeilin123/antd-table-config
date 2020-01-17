@@ -27,7 +27,6 @@ function AntdTableConfig(props) {
   const [currentColumn, setCurrentColumn] = useState({});
   const [lineNumber, setLineNumber] = useState(undefined);
   const columnMap = columns.reduce((a, b) => { a[b.dataIndex] = true; return a; }, {});
-
   useEffect(() => {
     if (Array.isArray(value) && value.length) {
       Columns.set(value);
@@ -191,7 +190,7 @@ function AntdTableConfig(props) {
       cancelText: '取消',
       okText: '确认',
       onOk: () => {
-        Columns.clear();
+        Columns.set(value);
         updateColumns();
       },
     });
