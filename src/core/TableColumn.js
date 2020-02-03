@@ -20,7 +20,7 @@ class TableColumn {
   }
 
   replace(column, targetIndex) {
-    this.data[targetIndex] = column;
+    this.data[targetIndex] = { ...this.data[targetIndex], ...column };
   }
 
   swap(sourceIndex, targetIndex) {

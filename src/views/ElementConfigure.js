@@ -2,7 +2,6 @@ import React, { useState, useMemo } from 'react';
 import Icon from 'antd/es/icon';
 import DragingIcon from '../components/DragingIcon';
 
-
 const ElementConfigure = React.forwardRef((props, ref) => {
   const { columns = [], onOpen } = props;
   const [currentDragIndex, setCurrentDragIndex] = useState();
@@ -21,7 +20,11 @@ const ElementConfigure = React.forwardRef((props, ref) => {
           <div className='atc-column' key={data.dataIndex || index + 1}>
             <div className='atc-column-index'>
               {index + 1}
-              <Icon type='edit' className='atc-column-edit' onClick={onOpen.bind(this, data, 'edit')} />
+              <Icon
+                type='edit'
+                className={`atc-column-edit${data.dataIndex ? '' : ' atc-column-disable'}`}
+                onClick={onOpen.bind(this, data, 'edit')}
+              />
             </div>
             <div
               draggable

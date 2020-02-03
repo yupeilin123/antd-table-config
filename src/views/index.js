@@ -15,7 +15,6 @@ let dragIndex;
 let enterIndex;
 const Columns = TableColumn.initialize();
 
-
 function AntdTableConfig(props) {
   const { dataSource = [], value = [], height, closable, onSave, onClose } = props;
   const configureRef = useRef();
@@ -178,15 +177,17 @@ function AntdTableConfig(props) {
   }
 
   function displayModalVisible(column, type) {
-    setModalVisible(!modalVisible);
-    setCurrentColumn(column);
-    setModalType(type);
+    if (column.dataIndex) {
+      setModalVisible(!modalVisible);
+      setCurrentColumn(column);
+      setModalType(type);
+    }
   }
 
   function restColumnConfig() {
     Modal.confirm({
       title: '清空列表配置',
-      content: '将为您情况所有的列配置项，是否确认情况？',
+      content: '将为您清空所有的列配置项，是否清空情况？',
       cancelText: '取消',
       okText: '确认',
       onOk: () => {
@@ -268,7 +269,7 @@ function AntdTableConfig(props) {
         visible={modalType === 'edit' && modalVisible}
         formValue={currentColumn}
         onOk={editColumn}
-        onCancel={displayModalVisible.bind(this, {}, 'edit')}
+        onCancel={displayModalVisible.bind(this, currentColumn, 'edit')}
       />
       <Modal
         title='预览'
