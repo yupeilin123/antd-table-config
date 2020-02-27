@@ -12,4 +12,5 @@ export default [
   'antd/es/modal/style',
   'antd/es/button/style',
   'antd/es/icon',
+  'antd/es/tooltip',
 ];
