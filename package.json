@@ -1,6 +1,6 @@
 {
   "name": "antd-table-config",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "description": "A component that can be configured to display table",
   "main": "lib/index.js",
   "repository": {

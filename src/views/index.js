@@ -4,6 +4,7 @@ import Button from 'antd/es/button';
 import Table from 'antd/es/table';
 import Modal from 'antd/es/modal';
 import Icon from 'antd/es/icon';
+import Tooltip from 'antd/es/tooltip';
 import ElementConfigure from './ElementConfigure';
 import ColumnModal from './ColumnModal';
 import { TableColumn } from '../core';
@@ -216,7 +217,9 @@ function AntdTableConfig(props) {
                 element={element}
                 disable={columnMap[element.dataIndex]}
               >
-                {element.title}
+                <Tooltip title={element.title}>
+                  {element.title}
+                </Tooltip>
               </DndComp>
             ))
           }
