@@ -187,8 +187,8 @@ function AntdTableConfig(props) {
 
   function restColumnConfig() {
     Modal.confirm({
-      title: '清空列表配置',
-      content: '将为您清空所有的列配置项，是否清空情况？',
+      title: '恢复列表配置',
+      content: '将为您恢复到初始配置，是否确认恢复？',
       cancelText: '取消',
       okText: '确认',
       onOk: () => {
