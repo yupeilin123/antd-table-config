@@ -28,10 +28,15 @@ function AntdTableConfig(props) {
   const [lineNumber, setLineNumber] = useState(undefined);
   const columnMap = columns.reduce((a, b) => { a[b.dataIndex] = true; return a; }, {});
   useEffect(() => {
-    if (Array.isArray(value) && value.length) {
+    if (Array.isArray(value)) {
+      setColumns(value);
       Columns.set(value);
       updateColumns();
     }
+    return () => {
+      setColumns([]);
+      Columns.clear();
+    };
   }, [value]);
 
   useEffect(() => {
