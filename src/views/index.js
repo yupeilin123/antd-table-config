@@ -17,7 +17,7 @@ let enterIndex;
 const Columns = TableColumn.initialize();
 
 function AntdTableConfig(props) {
-  const { dataSource = [], value = [], height, closable, onSave, onClose } = props;
+  const { dataSource = [], value, height, closable, onSave, onClose } = props;
   const configureRef = useRef();
   const elementGroupRef = useRef();
   const atcLayoutRef = useRef();
