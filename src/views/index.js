@@ -21,12 +21,17 @@ function AntdTableConfig(props) {
   const configureRef = useRef();
   const elementGroupRef = useRef();
   const atcLayoutRef = useRef();
+  const atcContentRef = useRef();
   const [columns, setColumns] = useState([]);
   const [modalVisible, setModalVisible] = useState(false);
   const [modalType, setModalType] = useState();
   const [currentColumn, setCurrentColumn] = useState({});
   const [lineNumber, setLineNumber] = useState(undefined);
-  const columnMap = columns.reduce((a, b) => { a[b.dataIndex] = true; return a; }, {});
+  const [action, setAction] = useState('draging');
+  const columnMap = columns.reduce((a, b) => {
+    a[b.dataIndex] = true;
+    return a;
+  }, {});
   useEffect(() => {
     if (Array.isArray(value)) {
       setColumns(value);
@@ -41,7 +46,8 @@ function AntdTableConfig(props) {
 
   useEffect(() => {
     atcLayoutRef.current.addEventListener('dragover', setMoveDropEffect);
-    elementGroupRef.current.addEventListener('dragenter', setEnterIndex);
+    elementGroupRef.current.addEventListener('dragenter', enterElementGroup);
+    atcContentRef.current.addEventListener('dragenter', leaveElementGroup);
     configureRef.current.addEventListener('dragstart', dragStart);
     configureRef.current.addEventListener('dragend', dragend);
     configureRef.current.addEventListener('dragenter', dragenter);
@@ -49,7 +55,8 @@ function AntdTableConfig(props) {
     configureRef.current.addEventListener('drop', drop);
     return () => {
       atcLayoutRef.current.removeEventListener('dragover', setMoveDropEffect);
-      elementGroupRef.current.removeEventListener('dragenter', setEnterIndex);
+      elementGroupRef.current.removeEventListener('dragenter', enterElementGroup);
+      atcContentRef.current.removeEventListener('dragenter', leaveElementGroup);
       configureRef.current.removeEventListener('dragstart', dragStart);
       configureRef.current.removeEventListener('dragend', dragend);
       configureRef.current.removeEventListener('dragenter', dragenter);
@@ -63,14 +70,24 @@ function AntdTableConfig(props) {
     e.preventDefault();
   }
 
-  function setEnterIndex() {
+  function enterElementGroup(e) {
     enterIndex = undefined;
+    if (e.target === elementGroupRef.current || e.target.parentElement === elementGroupRef.current) {
+      setAction('droping');
+    }
+  }
+
+  function leaveElementGroup() {
+    setAction('draging');
   }
 
   function dragStart(e) {
     e.target.style.opacity = 0.5;
     const dragObj = e.target;
-    const columnList = Array.from(configureRef.current.children).map((ele) => ele.lastElementChild);
+    setAction('draging');
+    const columnList = Array.from(configureRef.current.children).map(
+      (ele) => ele.lastElementChild,
+    );
     columnList.forEach((columnObj, index) => {
       if (columnObj === dragObj) {
         dragIndex = index;
@@ -79,17 +96,25 @@ function AntdTableConfig(props) {
   }
   function dragend(e) {
     e.target.style.opacity = '';
-    const findColumn = Columns.get().find((_) => _.dataIndex === e.target.dataset.index);
-    moveColumn({
-      x: e.clientX,
-      y: e.clientY,
-    }, findColumn);
+    setAction('');
+    const findColumn = Columns.get().find(
+      (_) => _.dataIndex === e.target.dataset.index,
+    );
+    moveColumn(
+      {
+        x: e.clientX,
+        y: e.clientY,
+      },
+      findColumn,
+    );
   }
   function dragenter(e) {
     if (e.target.className === 'atc-column-title') {
       e.target.style.borderStyle = 'dotted';
       const enterObj = e.target;
-      const columnList = Array.from(configureRef.current.children).map((ele) => ele.lastElementChild);
+      const columnList = Array.from(configureRef.current.children).map(
+        (ele) => ele.lastElementChild,
+      );
       columnList.forEach((columnObj, index) => {
         if (columnObj === enterObj) {
           enterIndex = index;
@@ -131,10 +156,13 @@ function AntdTableConfig(props) {
   }
 
   function addColumn(element, insertIndex) {
-    Columns.insert({
-      ...element,
-      width: 120,
-    }, insertIndex);
+    Columns.insert(
+      {
+        ...element,
+        width: 120,
+      },
+      insertIndex,
+    );
     updateColumns();
   }
 
@@ -161,9 +189,16 @@ function AntdTableConfig(props) {
 
   function moveColumn(layout, element) {
     const { x, y } = layout;
-    const { left, right, top, bottom } = configureRef.current.getBoundingClientRect();
-    if (left > x || right < x || top > y || bottom < y) {
-      const index = Columns.get().findIndex((_) => _.dataIndex === element.dataIndex);
+    const {
+      left,
+      right,
+      top,
+      bottom,
+    } = elementGroupRef.current.getBoundingClientRect();
+    if (left <= x && right >= x && top <= y && bottom >= y) {
+      const index = Columns.get().findIndex(
+        (_) => _.dataIndex === element.dataIndex,
+      );
       deleteColumn(index);
     }
   }
@@ -183,7 +218,6 @@ function AntdTableConfig(props) {
   }
 
   function displayModalVisible(column, type) {
-    console.log(column, type);
     if (column.dataIndex) {
       setModalVisible(!modalVisible);
       setCurrentColumn(column);
@@ -212,32 +246,47 @@ function AntdTableConfig(props) {
 
   return (
     <section className='atc-layout' ref={atcLayoutRef} style={{ height }}>
-      <section className='atc-slider' ref={elementGroupRef} data-drag-type='element'>
-        <div className='atc-group-title'>元素库</div>
-        <div className='atc-elements-container'>
-          {
-            (dataSource || []).map((element) => (
-              <DndComp
-                key={element.dataIndex}
-                className='atc-element'
-                element={element}
-                disable={columnMap[element.dataIndex]}
-              >
-                <Tooltip title={element.title}>
-                  {element.title}
-                </Tooltip>
-              </DndComp>
-            ))
-          }
-        </div>
+      <section
+        className={`atc-slider ${action
+          && (action === 'draging'
+            ? ' atc-dnd-box atc-drag-container'
+            : ' atc-dnd-box atc-drop-container')}`}
+        ref={elementGroupRef}
+        data-drag-type='element'
+      >
+        {action ? (
+          <>
+            <div className='atc-del-block' data-drag-type='element' />
+            <div className='atc-del-label' data-drag-type='element'>将元素拖动至此处</div>
+            <div className='atc-del-label' data-drag-type='element'>已移除元素</div>
+          </>
+        ) : (
+          <>
+            <div className='atc-group-title'>元素库</div>
+            <div className='atc-elements-container'>
+              {(dataSource || []).map((element) => (
+                <DndComp
+                  key={element.dataIndex}
+                  className='atc-element'
+                  element={element}
+                  disable={columnMap[element.dataIndex]}
+                >
+                  <Tooltip title={element.title}>{element.title}</Tooltip>
+                </DndComp>
+              ))}
+            </div>
+          </>
+        )}
       </section>
-      <section className='atc-layout-content'>
+      <section className='atc-layout-content' ref={atcContentRef}>
         <div className='atc-config-header'>
           <div className='atc-group-title'>列表配置</div>
           <div className='atc-config-tip'>
             <Icon type='info-circle' className='atc-config-tip-icon' />
             你可以通过拖放元素库中的元素来自定义列表
-            <div style={{ paddingLeft: 20 }}>添加的行数多余一行时，按第一行添加</div>
+            <div style={{ paddingLeft: 20 }}>
+              添加的行数多余一行时，按第一行添加
+            </div>
           </div>
         </div>
         <ElementConfigure
@@ -262,7 +311,10 @@ function AntdTableConfig(props) {
             添加
           </div>
           <div className='atc-operation-divider' />
-          <div className='atc-rows-btn atc-rows-delete' onClick={handleDeleteColumn}>
+          <div
+            className='atc-rows-btn atc-rows-delete'
+            onClick={handleDeleteColumn}
+          >
             <Icon type='delete' className='atc-rows-icon' />
             删除
           </div>
@@ -272,12 +324,26 @@ function AntdTableConfig(props) {
               className='atc-operation-btn'
               type='primary'
               ghost
-              onClick={displayModalVisible.bind(this, { dataIndex: true }, 'preview')}
+              onClick={displayModalVisible.bind(
+                this,
+                { dataIndex: true },
+                'preview',
+              )}
             >
               预览
             </Button>
-            <Button className='atc-operation-btn' type='primary' onClick={saveColumns}>保存</Button>
-            {closable && <Button className='atc-operation-btn' onClick={onClose}>关闭</Button>}
+            <Button
+              className='atc-operation-btn'
+              type='primary'
+              onClick={saveColumns}
+            >
+              保存
+            </Button>
+            {closable && (
+              <Button className='atc-operation-btn' onClick={onClose}>
+                关闭
+              </Button>
+            )}
           </div>
         </div>
       </section>
@@ -294,12 +360,16 @@ function AntdTableConfig(props) {
         width={780}
         footer={null}
         visible={modalType === 'preview' && modalVisible}
-        onCancel={displayModalVisible.bind(this, { dataIndex: true }, 'preview')}
+        onCancel={displayModalVisible.bind(
+          this,
+          { dataIndex: true },
+          'preview',
+        )}
       >
         <Table
           columns={columns}
           dataSource={[]}
-          scroll={{ x: columns.reduce((a, b) => (a + b.width), 0) }}
+          scroll={{ x: columns.reduce((a, b) => a + b.width, 0) }}
           size='small'
         />
       </Modal>

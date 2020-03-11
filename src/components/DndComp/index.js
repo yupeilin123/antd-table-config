@@ -7,7 +7,7 @@ export default function DndComp(props) {
   const [position, setPosition] = useState({ offsetX: 0, offsetY: 0 });
   const [isDarging, setIsDraging] = useState(false);
   function handleDragStart(e) {
-    e.target.style.borderColor = '#188EF2';
+    e.target.style.opacity = 0.45;
     e.dataTransfer.setData('element', JSON.stringify(element));
     setPosition({
       offsetX: e.nativeEvent.offsetX,
@@ -18,7 +18,7 @@ export default function DndComp(props) {
   function handleDragEnd(e) {
     const left = e.pageX - position.offsetX;
     const top = e.pageY - position.offsetY;
-    e.target.style.borderColor = '';
+    e.target.style.opacity = '';
     setIsDraging(false);
     if (onDrop) {
       const clientLayout = {

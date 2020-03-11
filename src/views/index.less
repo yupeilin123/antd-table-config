@@ -53,8 +53,9 @@
 
 .@{prefix}-used-selected {
   background: #00000008;
+  border-color: #0003 !important;
   color: #0000008c;
-  cursor: default !important;
+  cursor: not-allowed !important;
 }
 
 .@{prefix}-element {
@@ -65,7 +66,7 @@
   border-radius: 4px;
   margin-bottom: 6px;
   margin-right: 6px;
-  border: 1px solid #0003;
+  border: 1px solid #188ef2ef;
   text-align: center;
   line-height: 40px;
   font-size: 14px;
@@ -76,6 +77,43 @@
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+.@{prefix}-dnd-box {
+  border: 2px dashed #f7f3f300;
+  text-align: center;
+  padding-top: 13%;
+
+  &.@{prefix}-drag-container {
+    border-color: #9facc3a6;
+    background-color: #9facc317;
+  }
+
+  &.@{prefix}-drop-container {
+    border-color: #f04f4340;
+    background-color: #f04f430d;
+  }
+}
+
+.@{prefix}-del-block {
+  margin: 0 auto;
+  height: 70px;
+  width: 70px;
+  background-color: #ccd4e1ff;
+  box-shadow: 0 0 8px 0 #ccd4e1;
+  border-radius: 50%;
+  margin-bottom: 24px;
+
+  &::after {
+    content: url('../assets/recovery.png');
+    display: inline-block;
+    margin-top: 10px;
+  }
+}
+
+.@{prefix}-del-label {
+  color: #000000c7;
+  line-height: 1.6;
 }
 
 .@{prefix}-config-tip {
