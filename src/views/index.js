@@ -183,6 +183,7 @@ function AntdTableConfig(props) {
   }
 
   function displayModalVisible(column, type) {
+    console.log(column, type);
     if (column.dataIndex) {
       setModalVisible(!modalVisible);
       setCurrentColumn(column);
@@ -267,7 +268,14 @@ function AntdTableConfig(props) {
           </div>
           <div className='atc-operation-btns'>
             <Button onClick={restColumnConfig}>重置</Button>
-            <Button className='atc-operation-btn' type='primary' ghost onClick={displayModalVisible.bind(this, {}, 'preview')}>预览</Button>
+            <Button
+              className='atc-operation-btn'
+              type='primary'
+              ghost
+              onClick={displayModalVisible.bind(this, { dataIndex: true }, 'preview')}
+            >
+              预览
+            </Button>
             <Button className='atc-operation-btn' type='primary' onClick={saveColumns}>保存</Button>
             {closable && <Button className='atc-operation-btn' onClick={onClose}>关闭</Button>}
           </div>
@@ -286,7 +294,7 @@ function AntdTableConfig(props) {
         width={780}
         footer={null}
         visible={modalType === 'preview' && modalVisible}
-        onCancel={displayModalVisible.bind(this, {}, 'preview')}
+        onCancel={displayModalVisible.bind(this, { dataIndex: true }, 'preview')}
       >
         <Table
           columns={columns}
