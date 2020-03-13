@@ -3,7 +3,7 @@ import Icon from 'antd/es/icon';
 import DragingIcon from '../components/DragingIcon';
 
 const ElementConfigure = React.forwardRef((props, ref) => {
-  const { columns = [], onOpen } = props;
+  const { columns = [], onEdit } = props;
   const [currentDragIndex, setCurrentDragIndex] = useState();
 
   function handleMouseEnter(dataIndex) {
@@ -23,7 +23,7 @@ const ElementConfigure = React.forwardRef((props, ref) => {
               <Icon
                 type='edit'
                 className={`atc-column-edit${data.dataIndex ? '' : ' atc-column-disable'}`}
-                onClick={onOpen.bind(this, data, 'edit')}
+                onClick={onEdit.bind(this, data)}
               />
             </div>
             <div

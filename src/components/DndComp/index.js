@@ -13,7 +13,6 @@ export default function DndComp(props) {
       offsetX: e.nativeEvent.offsetX,
       offsetY: e.nativeEvent.offsetY,
     });
-    setIsDraging(true);
   }
   function handleDragEnd(e) {
     const left = e.pageX - position.offsetX;
@@ -21,14 +20,11 @@ export default function DndComp(props) {
     e.target.style.opacity = '';
     setIsDraging(false);
     if (onDrop) {
-      const clientLayout = {
-        clientX: e.clientX,
-        clientY: e.clientY,
-      };
       onDrop({
         x: left,
         y: top,
-        ...clientLayout,
+        clientX: e.clientX,
+        clientY: e.clientY,
       }, element);
     }
   }

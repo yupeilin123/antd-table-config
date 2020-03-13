@@ -18,6 +18,8 @@ module.exports = {
     'import/prefer-default-export': [0],
     'react/jsx-filename-extension': [1, { 'extensions': ['.js', '.jsx'] }],
     'react/state-in-constructor': [0],
+    'react/jsx-first-prop-new-line': [0],
+    'react/jsx-max-props-per-line': [0],
     'react/destructuring-assignment': [0],
     'react/no-access-state-in-setstate': [0],
     'react/prop-types': [0],
