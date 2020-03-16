@@ -6,7 +6,7 @@ const Materiel = React.forwardRef((props, ref) => {
   const { action, dataSource = {}, columnMap } = props;
   return (
     <section
-      className={`atc-slider ${action
+      className={`atc-slider${action
         && (action === 'draging'
           ? ' atc-dnd-box atc-drag-container'
           : ' atc-dnd-box atc-drop-container')}`}

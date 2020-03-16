@@ -47,19 +47,19 @@ function AntdTableConfig(props) {
 
   useEffect(() => {
     atcLayoutRef.current.addEventListener('dragover', setMoveDropEffect);
-    materielRef.current.addEventListener('dragenter', enterElementGroup);
-    atcContentRef.current.addEventListener('dragenter', leaveElementGroup);
+    materielRef.current.addEventListener('dragenter', setEnterIndex);
     configureRef.current.addEventListener('dragstart', dragStart);
     configureRef.current.addEventListener('dragend', dragend);
+    configureRef.current.addEventListener('drag', drag);
     configureRef.current.addEventListener('dragenter', dragenter);
     configureRef.current.addEventListener('dragleave', dragleave);
     configureRef.current.addEventListener('drop', drop);
     return () => {
       atcLayoutRef.current.removeEventListener('dragover', setMoveDropEffect);
-      materielRef.current.removeEventListener('dragenter', enterElementGroup);
-      atcContentRef.current.removeEventListener('dragenter', leaveElementGroup);
+      materielRef.current.removeEventListener('dragenter', setEnterIndex);
       configureRef.current.removeEventListener('dragstart', dragStart);
       configureRef.current.removeEventListener('dragend', dragend);
+      configureRef.current.removeEventListener('drag', drag);
       configureRef.current.removeEventListener('dragenter', dragenter);
       configureRef.current.removeEventListener('dragleave', dragleave);
       configureRef.current.removeEventListener('drop', drop);
@@ -67,21 +67,13 @@ function AntdTableConfig(props) {
   }, []);
 
   function setMoveDropEffect(e) {
-    e.dataTransfer.dropEffect = 'move';
     e.preventDefault();
+    e.dataTransfer.dropEffect = 'move';
   }
 
-  function enterElementGroup(e) {
+  function setEnterIndex(e) {
     enterIndex = undefined;
-    if (e.target === materielRef.current || e.target.parentElement === materielRef.current) {
-      setAction('droping');
-    }
   }
-
-  function leaveElementGroup() {
-    setAction('draging');
-  }
-
   function dragStart(e) {
     e.target.style.opacity = 0.5;
     const dragObj = e.target;
@@ -126,6 +118,15 @@ function AntdTableConfig(props) {
   function dragleave(e) {
     if (e.target.style.borderStyle === 'dotted') {
       e.target.style.borderStyle = 'solid';
+    }
+  }
+
+  function drag(e) {
+    const { left, right, top, bottom } = materielRef.current.getBoundingClientRect();
+    if (left <= e.clientX && right >= e.clientX && top <= e.clientY && bottom >= e.clientY) {
+      setAction('droging');
+    } else {
+      setAction('draging');
     }
   }
 
@@ -244,6 +245,7 @@ function AntdTableConfig(props) {
   return (
     <section className='atc-layout' ref={atcLayoutRef} style={{ height }}>
       <Materiel
+        action={action}
         dataSource={dataSource}
         columnMap={columnMap}
         ref={materielRef}

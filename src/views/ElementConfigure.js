@@ -14,7 +14,7 @@ const ElementConfigure = React.forwardRef((props, ref) => {
   }
 
   const ConfigureAREA = useMemo(() => (
-    <div className='atc-config-area' ref={ref} data-drag-type='column'>
+    <div className='atc-config-area' ref={ref}>
       {
         columns.map((data, index) => (
           <div className='atc-column' key={data.dataIndex || index + 1}>
@@ -29,6 +29,7 @@ const ElementConfigure = React.forwardRef((props, ref) => {
             <div
               draggable
               className='atc-column-title'
+              data-drag-type='column'
               onMouseEnter={handleMouseEnter.bind(this, data.dataIndex || index + 1)}
               onMouseLeave={handleMouseLeave}
               data-index={data.dataIndex}
