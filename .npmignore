@@ -4,6 +4,8 @@ scripts
 src
 dist
 
+antdPackage.js
+
 .browserslistrc
 .editorconfig
 .eslintignore

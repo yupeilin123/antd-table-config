@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState } from 'react';
 import Icon from 'antd/es/icon';
 import DragingIcon from '../components/DragingIcon';
 
@@ -13,7 +13,7 @@ const ElementConfigure = React.forwardRef((props, ref) => {
     setCurrentDragIndex();
   }
 
-  const ConfigureAREA = useMemo(() => (
+  return (
     <div className='atc-config-area' ref={ref}>
       {
         columns.map((data, index) => (
@@ -23,7 +23,7 @@ const ElementConfigure = React.forwardRef((props, ref) => {
               <Icon
                 type='edit'
                 className={`atc-column-edit${data.dataIndex ? '' : ' atc-column-disable'}`}
-                onClick={onEdit.bind(this, data)}
+                onClick={data.dataIndex && onEdit.bind(this, data)}
               />
             </div>
             <div
@@ -41,9 +41,10 @@ const ElementConfigure = React.forwardRef((props, ref) => {
         ))
       }
     </div>
-  ), [columns, currentDragIndex]);
-
-  return ConfigureAREA;
+  );
 });
 
-export default ElementConfigure;
+export default React.memo(ElementConfigure, (prevProps, nextProps) => {
+  if (prevProps.columns !== nextProps.columns || prevProps.currentDragIndex !== nextProps.currentDragIndex) return false;
+  return true;
+});

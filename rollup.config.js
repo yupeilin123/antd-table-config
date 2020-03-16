@@ -2,6 +2,7 @@ import babel from 'rollup-plugin-babel';
 import resolve from 'rollup-plugin-node-resolve';
 import commonjs from 'rollup-plugin-commonjs';
 import postcss from 'rollup-plugin-postcss';
+import copy from 'rollup-plugin-copy';
 import antdPackage from './antdPackage';
 import { version } from './package.json';
 
@@ -15,6 +16,11 @@ export default {
   },
   external: [...antdPackage, 'react'],
   plugins: [
+    copy({
+      targets: [
+        { src: 'src/assets/recovery.png', dest: 'assets' },
+      ],
+    }),
     postcss({
       extensions: ['.css', '.less'],
       extract: './style/css.css',

@@ -3,12 +3,12 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import ConfigProvider from 'antd/es/config-provider';
 import zhCN from 'antd/es/locale/zh_CN';
-import AntdListConfig from './views';
+import AntdTableConfig from './views';
 import './app.less';
 
 const App = () => (
   <ConfigProvider locale={zhCN}>
-    <AntdListConfig />
+    <AntdTableConfig />
   </ConfigProvider>
 );
 
