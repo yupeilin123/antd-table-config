@@ -40,6 +40,6 @@ const OperationBar = ({
 
 
 export default React.memo(OperationBar, (prevProps, nextProps) => {
-  if (prevProps.lineNumber !== nextProps.lineNumber) return false;
+  if (prevProps.lineNumber !== nextProps.lineNumber || prevProps.columns !== nextProps.columns) return false;
   return true;
 });
