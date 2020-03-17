@@ -257,7 +257,7 @@ function AntdTableConfig(props) {
             <Icon type='info-circle' className='atc-config-tip-icon' />
             你可以通过拖放元素库中的元素来自定义列表
             <div style={{ paddingLeft: 20 }}>
-              添加的行数多余一行时，按第一行添加
+              添加的行数多于一行时，按第一行添加
             </div>
           </div>
         </div>
