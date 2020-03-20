@@ -24,7 +24,6 @@ function AntdTableConfig(props) {
   const [editVisible, setEditVisible] = useState(false);
   const [previewVisible, setPreviewVisible] = useState(false);
   const [currentColumn, setCurrentColumn] = useState({});
-  const [lineNumber, setLineNumber] = useState(undefined);
   const [action, setAction] = useState('');
   const columnMap = React.useMemo(() => (
     columns.reduce((a, b) => {
@@ -200,20 +199,6 @@ function AntdTableConfig(props) {
     }
   }
 
-  function handleAddColumn() {
-    if (typeof lineNumber === 'number') {
-      addColumn({}, lineNumber - 1);
-      setLineNumber();
-    }
-  }
-
-  function handleDeleteColumn() {
-    if (typeof lineNumber === 'number') {
-      deleteColumn(lineNumber - 1);
-      setLineNumber();
-    }
-  }
-
   function restColumnConfig() {
     Modal.confirm({
       title: '恢复列表配置',
@@ -256,9 +241,6 @@ function AntdTableConfig(props) {
           <div className='atc-config-tip'>
             <Icon type='info-circle' className='atc-config-tip-icon' />
             你可以通过拖放元素库中的元素来自定义列表
-            <div style={{ paddingLeft: 20 }}>
-              添加的行数多于一行时，按第一行添加
-            </div>
           </div>
         </div>
         <ElementConfigure
@@ -268,11 +250,6 @@ function AntdTableConfig(props) {
         />
         <OperationBar
           closable={closable}
-          columns={columns}
-          lineNumber={lineNumber}
-          onSetLineNumber={setLineNumber}
-          onAddColumn={handleAddColumn}
-          onDeleteColumn={handleDeleteColumn}
           onPreviewModal={displayPreviewModalVisible}
           onSave={saveColumns}
           onRest={restColumnConfig}
