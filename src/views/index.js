@@ -137,8 +137,6 @@ function AntdTableConfig(props) {
       if (typeof enterIndex === 'number') {
         if (Columns.get()[enterIndex].dataIndex) {
           addColumn(element, enterIndex + 1);
-        } else {
-          replaceColumn(element, enterIndex);
         }
       } else {
         addColumn(element, Columns.get().length);
