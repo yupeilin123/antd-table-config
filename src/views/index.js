@@ -15,7 +15,7 @@ let enterIndex;
 const Columns = TableColumn.initialize();
 
 function AntdTableConfig(props) {
-  const { dataSource = [], value, height, closable, onSave, onClose } = props;
+  const { dataSource = [], value, height, closable, restable, onSave, onCancel, saveButtonProps, cancelButtonProps } = props;
   const configureRef = useRef();
   const materielRef = useRef();
   const atcLayoutRef = useRef();
@@ -248,10 +248,13 @@ function AntdTableConfig(props) {
         />
         <OperationBar
           closable={closable}
+          restable={restable}
           onPreviewModal={displayPreviewModalVisible}
           onSave={saveColumns}
           onRest={restColumnConfig}
-          onClose={onClose}
+          onCancel={onCancel}
+          saveButtonProps={saveButtonProps}
+          cancelButtonProps={cancelButtonProps}
         />
       </section>
       <ColumnModal
